@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>কার্যদিবস ক্যালকুলেটর | ডিজিটাল ল্যান্ড টুলস</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ----- Root Variables (consistent with main project) ----- */
+        :root {
+            --primary-blue: #1a56db;
+            --primary-glow: #3b82f6;
+            --bg-light: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --border-color: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-soft: #334155;
+            --header-bg: #ffffff;
+            --shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 25px 30px -12px rgba(0, 0, 0, 0.2);
+            --accent-gradient: linear-gradient(135deg, #1a56db 0%, #10b981 100%);
+            --footer-bg-start: #0f172a;
+            --footer-bg-end: #1e293b;
+            --input-bg: #ffffff;
+            --danger: #dc2626;
+            --success: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --bg-light: #0b1120;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-dark: #f1f5f9;
+            --text-soft: #cbd5e1;
+            --header-bg: #0f172a;
+            --shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 25px 30px -12px rgba(0, 0, 0, 0.6);
+            --footer-bg-start: #020617;
+            --footer-bg-end: #0f172a;
+            --input-bg: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            transition: background 0.4s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* ----- Header & Sidebar (exactly as main) ----- */
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--accent-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 14px -6px rgba(26, 86, 219, 0.3);
+        }
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        header h1 { font-size: 1.6rem; font-weight: 700; }
+        header span { background: var(--accent-gradient); background-clip: text; -webkit-background-clip: text; color: transparent; }
+
+        .theme-btn {
+            background: var(--primary-blue);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* সাইডবার বাটন স্টাইল */
+                /* Sidebar 3D glass */
+        .sidebar-toggle-btn {
+            position: relative;
+            overflow: visible;
+
+            font-size: 34px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 60px;
+
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--text-dark);
+            cursor: pointer;
+
+            margin-left: 1.2rem;
+            margin-bottom: -20px;
+
+            transition: all .3s ease;
+        }
+
+        /* Arrow */
+        .sidebar-toggle-btn::after{
+            content: "❯";
+
+            position: absolute;
+            left: 100%;
+            top: 50%;
+
+            transform: translateY(-50%) translateX(-15px);
+
+            opacity: 0;
+
+            font-size: 28px;
+            color: var(--primary-blue);
+
+            transition: all .35s ease;
+        }
+
+        /* Hover Effect */
+        .sidebar-toggle-btn:hover{
+            background: #3b82f6;
+            color: white;
+
+            transform: scale(1.05);
+        }
+
+        .sidebar-toggle-btn:hover::after{
+            opacity: 1;
+            animation: arrowMove .8s infinite;
+        }
+
+        @keyframes arrowMove{
+            0%{
+                transform: translateY(-50%) translateX(0);
+            }
+            50%{
+                transform: translateY(-50%) translateX(12px);
+            }
+            100%{
+                transform: translateY(-50%) translateX(0);
+            }
+        }
+
+        /* সাইডবার মেইন স্টাইল */
+        /* সাইডবার মেইন স্টাইল */
+        /* ----- সাইডবার মেইন স্টাইল ----- */
+        .sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            left: -280px !important; /* ডিফল্ট স্ক্রিনের বাইরে পাঠাতে এটি বাধ্য করবে */
+            width: 280px !important;
+            height: 100vh !important;
+            background: var(--card-bg) !important;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1) !important;
+            z-index: 99999 !important;
+            transition: left 0.3s ease-in-out !important;
+            padding: 20px !important;
+            overflow-y: auto !important;
+        }
+
+        /* যখন জাভাস্ক্রিপ্ট 'open' ক্লাস যোগ করবে */
+        .sidebar.open {
+            left: 0 !important; /* স্ক্রিনের ভেতরে নিয়ে আসবে */
+        }
+
+        /* ওভারলে ব্যাকগ্রাউন্ড */
+        #overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0, 0, 0, 0.4) !important;
+            z-index: 99998 !important;
+            display: none;
+        }
+        #overlay.show {
+            display: block !important;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .css-profile-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            /* সুন্দর নীল ও সবুজ রঙের 3D গ্লসি গ্রাডিয়েন্ট */
+            background: linear-gradient(135deg, #1a56db 0%, #10b981 100%);
+            box-shadow: 
+                inset -2px -2px 6px rgba(0, 0, 0, 0.3), 
+                inset 2px 2px 6px rgba(255, 255, 255, 0.6), 
+                0 4px 10px rgba(26, 86, 219, 0.3);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .css-profile-logo:hover {
+            transform: scale(1.30) rotate(30deg);
+        }
+        /* নেভিগেশন আইটেম */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-weight: 500;
+            transition: 0.3s;
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-blue);
+            color: white !important;
+            transform: translateX(8px); /* হোভার করলে ৮ পিক্সেল ডানে সরবে */
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+        }
+
+        .nav-item.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 8px 15px rgba(26, 86, 219, 0.3);
+        }
+
+        /* আইকনগুলোর জন্য আলাদা হোভার ইফেক্ট (ঐচ্ছিক) */
+        .nav-item span {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover span {
+            transform: scale(1.2); /* হোভার করলে ইমোজি বা আইকন একটু বড় হবে */
+        }
+
+        /* Overlay (ব্যাকগ্রাউন্ড অন্ধকার করা) */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 99998; /* সাইডবারের ঠিক নিচে */
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #overlay.show {
+            display: block;
+            opacity: 1;
+        }
+        /* Main layout */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem 3rem;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 36px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s ease;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Input panel */
+        .input-panel, .result-panel {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 1.8rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .input-panel:hover, .result-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 60px;
+            background: var(--input-bg);
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.2);
+        }
+        .form-input:hover {
+            border-color: #93c5fd; /* হালকা নীল বর্ডার */
+            transform: translateY(-5px); /* খুব সামান্য উপরে উঠবে */
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-blue), #10b981);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -8px rgba(26,86,219,0.4);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            border-radius: 60px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
+        /* Excluded list inside right panel */
+        .excluded-list {
+            margin-top: 1.5rem;
+            max-height: 320px;
+            overflow-y: auto;
+            border-radius: 24px;
+        }
+        .excluded-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+            padding: 10px 14px;
+            border-radius: 60px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-blue);
+            transition: 0.2s;
+        }
+        .excluded-date {
+            font-weight: 700;
+            min-width: 100px;
+        }
+        .badge-reason {
+            background: rgba(26,86,219,0.15);
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        .badge-weekend {
+            background: linear-gradient(135deg, var(--primary-blue), #10b981);
+            color: white;
+        }
+        .badge-holiday {
+            background: #10b981;
+            color: white;
+        }
+        .badge-mixed {
+            background: #f59e0b;
+            color: white;
+        }
+        .custom-holiday-list {
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .holiday-item {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-light);
+            padding: 6px 12px;
+            border-radius: 40px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .del-holiday {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer{
+            margin-top: 30px;
+            padding: 22px 15px;
+
+            text-align: center;
+
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+
+            border-top: 1px solid rgba(255,255,255,0.08);
+
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* উপরের glow effect */
+        footer::before{
+            content: "";
+            position: absolute;
+
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 300px;
+            height: 120px;
+
+            background: radial-gradient(circle, rgba(107, 164, 255, 0.35), transparent 70%);
+        }
+
+        /* Text Style */
+        footer h2{
+            position: relative;
+            z-index: 2;
+
+            font-size: 1.6rem;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+
+            color: #cbd5e1;
+        }
+
+        /* Name Highlight */
+        footer strong{
+            color: #1fb5ff;
+            font-weight: 700;
+
+            transition: 0.3s ease;
+        }
+
+        footer strong:hover{
+            color: #00a9f2;
+            text-shadow: 0 0 12px rgba(96,165,250,0.7);
+        }
+
+        /* Responsive */
+        @media(max-width:768px){
+
+            footer{
+                padding: 18px 10px;
+            }
+
+            footer h2{
+                font-size: 1.3 rem;
+                line-height: 1.7;
+            }
+
+        }
+        .form-input:hover {
+            transform: translateY(-5px);
+        }
+        @media (hover:hover) {
+
+            .form-input:hover {
+                transform: translateY(-5px);
+                border-color: #93c5fd;
+                box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15);
+            }
+
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            main { flex-direction: column; padding: 1rem; }
+            .left-column, .right-column { flex: 100%; }
+            .owner-row { flex-direction: column; gap: 0.5rem; align-items: stretch; }
+             .remove-btn { align-self: flex-end; }
+        }
+
+        .emoji-fix {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+            color: initial !important;
+            -webkit-text-fill-color: initial !important;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+        </div>
+        <h1><span>ডিজিটাল</span> ল্যান্ড টুলস</h1>
+    </div>
+    <button onclick="toggleDarkMode()" id="themeBtn" style="padding: 8px 16px; border-radius: 20px; border: none; background: var(--primary-blue); color: white; cursor: pointer; font-weight: 600;">🌙 Dark Mode</button>
+</header>
+
+<button onclick="toggleSidebar()" class="sidebar-toggle-btn">☰</button>
+
+<aside id="sidebar" class="sidebar">
+    <div class="user-profile">
+        <div class="css-profile-logo">$</div>
+        <div><h2>Saif Ahmed</h2><p>Canadian University of Bangladesh</p></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="namjari.html" class="nav-item"><span>📊</span>গ্রহীতার অংশ হিসাব</a>
+        <a href="faraiz.html" class="nav-item"><span>⚖️</span> উত্তরাধিকার ক্যালকুলেটর</a>
+        <a href="obhijog.html" class="nav-item"><span>📝</span> অভিযোগ সেকশন</a>
+        <a href="ticket.html" class="nav-item"><span>📩</span> টিকেট সেকশন</a>
+        <a href="letterwriter.html" class="nav-item"><span>📞</span> লেটার রাইটার নাম্বার</a>
+        <a href="workingday.html" class="nav-item active"><span>📅</span> কার্যদিবস ক্যালকুলেটর</a>
+    </nav>
+</aside>
+<div id="overlay" onclick="toggleSidebar()"></div>
+
+<main class="container">
+    <div class="glass-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.9rem; background: var(--accent-gradient); background-clip: text; -webkit-background-clip: text; color: transparent;">
+                <span class="emoji-fix">📅</span> কার্যদিবস ক্যালকুলেটর
+            </h2>
+            <p style="color: var(--text-soft);">বাংলাদেশ সরকারি ছুটি ও সাপ্তাহিক ছুটি (শুক্র+শনিবার) বিবেচনায় কার্য দিবস গণনা করুন। নিচে বাদ পড়া দিন ও কারণ দেখুন।</p>
+        </div>
+
+        <div class="two-columns">
+            <!-- Left Column: Inputs -->
+            <div class="input-panel">
+                <h3 style="margin-bottom: 1rem;">📆 সময়কাল নির্বাচন</h3>
+                <div class="form-group">
+                    <label class="form-label">শুরুর তারিখ</label>
+                    <input type="date" id="startDate" class="form-input" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">শেষের তারিখ</label>
+                    <input type="date" id="endDate" class="form-input" value="">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="includeEnd" checked style="width: 18px; height: 18px;">
+                    <label for="includeEnd">
+                    শেষ তারিখ গণনায় অন্তর্ভুক্ত করুন
+                    </label>
+                </div>
+                <button class="btn-primary" onclick="calculateWorkingDays()">⚡ কার্যদিবস হিসাব করুন</button>
+
+                <div style="margin-top: 1.8rem;">
+                    <h4>🎯 কাস্টম ছুটি যুক্ত করুন</h4>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <input type="date" id="customHolidayDate" class="form-input" style="flex:1;">
+                        <input type="text" id="customHolidayReason" placeholder="কারণ (যেমন: ঈদ/পূজা )" class="form-input" style="flex:2;">
+                        <button class="btn-outline" onclick="addCustomHoliday()">+ যোগ</button>
+                    </div>
+                    <div id="customHolidayList" class="custom-holiday-list"></div>
+                   <p class="form-label" style="font-size: 0.7rem; margin-top: 8px;">📌 স্থির ছুটি: ২১ ফেব্রুয়ারি, ২৬ মার্চ, ১৪ এপ্রিল, ১ মে, ১৫ আগস্ট, ১৬ ডিসেম্বর। প্রধান ধর্মীয় উৎসবসমূহ (২০২৬-২০৩০) |<br>শুক্র+শনিবার সাপ্তাহিক ছুটি স্বয়ংক্রিয়ভাবে বাদ যায়।</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Statistics + Excluded List -->
+            <div class="result-panel">
+                <h3 style="margin-bottom: 1rem;">📊 গণনার ফলাফল</h3>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div><span class="stat-number" id="totalDaysSpan">—</span><br>মোট দিন</div>
+                    <div><span class="stat-number" id="workingDaysSpan">—</span><br>কার্যদিবস</div>
+                    <div><span class="stat-number" id="excludedSpan">—</span><br>বাদ পড়া দিন</div>
+                </div>
+                <hr style="margin: 1.2rem 0; border-color: var(--border-color);">
+                
+                <!-- মন্তব্য + বাদ পড়া দিনের তালিকা (এডভান্সড ফিচার) -->
+                <div>
+                    <strong>🗓️ মন্তব্য:</strong> <span id="infoNote">শুক্র-শনিবার সাপ্তাহিক ছুটি + সরকারি ছুটি বাদ দেওয়া হবে।</span>
+                </div>
+                
+                <div id="excludedListContainer" style="margin-top: 1.5rem;">
+                    <h4 style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">📋 বাদ পড়া দিনের তালিকা (কারণসহ) <span style="font-size: 0.7rem;">🎯 ক্যালেন্ডার অনুযায়ী</span></h4>
+                    <div id="excludedList" class="excluded-list">
+                        <div style="text-align: center; padding: 1rem; color: var(--text-soft);">👉 উপরের তারিখ সিলেক্ট করে 'হিসাব করুন' ক্লিক করুন</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+        <h2> &copy; This website developed by <strong>Saif bro... </strong> 😏 </h2>
+    </footer>
+
+<script>
+    // ---------- Predefined Bangladesh Govt Holidays (month-day) ----------
+    const fixedHolidays = [
+        { mmdd: "02-21", name: "শহীদ দিবস ও আন্তর্জাতিক মাতৃভাষা দিবস" },
+        { mmdd: "03-26", name: "স্বাধীনতা ও জাতীয় দিবস" },
+        { mmdd: "04-14", name: "বাংলা নববর্ষ (পহেলা বৈশাখ)" },
+        { mmdd: "05-01", name: "মে দিবস (মে ডে)" },
+        { mmdd: "08-15", name: "জাতীয় শোক দিবস" },
+        { mmdd: "12-16", name: "বিজয় দিবস" }
+    ];
+
+    // ---------- Yearly Religious Holidays (Bangladesh Govt Calendar) ----------
+    const religiousHolidays = {
+        "2026": [
+            { mmdd: "02-25", name: "শবে বরাত" },
+            { mmdd: "03-20", name: "ঈদুল ফিতর (চাঁদ সাপেক্ষে)" },
+            { mmdd: "03-21", name: "ঈদুল ফিতর (২য় দিন)" },
+            { mmdd: "03-22", name: "ঈদুল ফিতর (৩য় দিন)" },
+            { mmdd: "05-01", name: "বুদ্ধ পূর্ণিমা (ঐতিহাসিক ও ধর্মীয়)" },
+            { mmdd: "05-27", name: "ঈদুল আজহা (চাঁদ সাপেক্ষে)" },
+            { mmdd: "05-28", name: "ঈদুল আজহা (২য় দিন)" },
+            { mmdd: "05-29", name: "ঈদুল আজহা (৩য় দিন)" },
+            { mmdd: "07-26", name: "আশুরা" },
+            { mmdd: "09-04", name: "শুভ জন্মাষ্টমী" },
+            { mmdd: "10-20", name: "দুর্গাপূজা (বিজয়ী দশমী)" },
+            { mmdd: "12-25", name: "যীশু খ্রীষ্টের জন্মদিন (বড়দিন)" }
+        ],
+        "2027": [
+            { mmdd: "02-14", name: "শবে বরাত" },
+            { mmdd: "03-09", name: "ঈদুল ফিতর (চাঁদ সাপেক্ষে)" },
+            { mmdd: "03-10", name: "ঈদুল ফিতর (২য় দিন)" },
+            { mmdd: "03-11", name: "ঈদুল ফিতর (৩য় দিন)" },
+            { mmdd: "05-17", name: "ঈদুল আজহা (চাঁদ সাপেক্ষে)" },
+            { mmdd: "05-18", name: "ঈদুল আজহা (২য় দিন)" },
+            { mmdd: "05-19", name: "ঈদুল আজহা (৩য় দিন)" },
+            { mmdd: "05-21", name: "বুদ্ধ পূর্ণিমা" },
+            { mmdd: "07-16", name: "আশুরা" },
+            { mmdd: "08-25", name: "শুভ জন্মাষ্টমী" },
+            { mmdd: "10-09", name: "দুর্গাপূজা (বিজয়ী দশমী)" },
+            { mmdd: "12-25", name: "যীশু খ্রীষ্টের জন্মদিন (বড়দিন)" }
+        ],
+        "2028": [
+            { mmdd: "02-03", name: "শবে বরাত" },
+            { mmdd: "02-26", name: "ঈদুল ফিতর (চাঁদ সাপেক্ষে)" },
+            { mmdd: "02-27", name: "ঈদুল ফিতর (২য় দিন)" },
+            { mmdd: "02-28", name: "ঈদুল ফিতর (৩য় দিন)" },
+            { mmdd: "05-05", name: "ঈদুল আজহা (চাঁদ সাপেক্ষে)" },
+            { mmdd: "05-06", name: "ঈদুল আজহা (২য় দিন)" },
+            { mmdd: "05-07", name: "ঈদুল আজহা (৩য় দিন)" },
+            { mmdd: "05-09", name: "বুদ্ধ পূর্ণিমা" },
+            { mmdd: "07-04", name: "আশুরা" },
+            { mmdd: "08-14", name: "শুভ জন্মাষ্টমী" },
+            { mmdd: "09-29", name: "দুর্গাপূজা (বিজয়ী দশমী)" },
+            { mmdd: "12-25", name: "যীশু খ্রীষ্টের জন্মদিন (বড়দিন)" }
+        ],
+        "2029": [
+            { mmdd: "02-15", name: "ঈদুল ফিতর (চাঁদ সাপেক্ষে)" },
+            { mmdd: "02-16", name: "ঈদুল ফিতর (২য় দিন)" },
+            { mmdd: "02-17", name: "ঈদুল ফিতর (৩য় দিন)" },
+            { mmdd: "04-24", name: "ঈদুল আজহা (চাঁদ সাপেক্ষে)" },
+            { mmdd: "04-25", name: "ঈদুল আজহা (২য় দিন)" },
+            { mmdd: "04-26", name: "ঈদুল আজহা (৩য় দিন)" },
+            { mmdd: "05-27", name: "বুদ্ধ পূর্ণিমা" },
+            { mmdd: "06-23", name: "আশুরা" },
+            { mmdd: "09-02", name: "শুভ জন্মাষ্টমী" },
+            { mmdd: "10-17", name: "দুর্গাপূজা (বিজয়ী দশমী)" },
+            { mmdd: "12-25", name: "যীশু খ্রীষ্টের জন্মদিন (বড়দিন)" }
+        ],
+        "2030": [
+            { mmdd: "02-04", name: "ঈদুল ফিতর (চাঁদ সাপেক্ষে)" },
+            { mmdd: "02-05", name: "ঈদুল ফিতর (২য় দিন)" },
+            { mmdd: "02-06", name: "ঈদুল ফিতর (৩য় দিন)" },
+            { mmdd: "04-14", name: "ঈদুল আজহা (চাঁদ সাপেক্ষে)" },
+            { mmdd: "04-15", name: "ঈদুল আজহা (২য় দিন)" },
+            { mmdd: "04-16", name: "ঈদুল আজহা (৩য় দিন)" },
+            { mmdd: "05-16", name: "বুদ্ধ পূর্ণিমা" },
+            { mmdd: "06-12", name: "আশুরা" },
+            { mmdd: "08-21", name: "শুভ জন্মাষ্টমী" },
+            { mmdd: "10-07", name: "দুর্গাপূজা (বিজয়ী দশমী)" },
+            { mmdd: "12-25", name: "যীশু খ্রীষ্টের জন্মদিন (বড়দিন)" }
+        ]
+    };
+    let userCustomHolidays = [];  // { date: "YYYY-MM-DD", reason: "..." }
+
+    // load custom holidays from localStorage
+    function loadCustomHolidays() {
+        let stored = localStorage.getItem('workingday_holidays');
+        try {
+            if (stored) {
+                userCustomHolidays = JSON.parse(stored);
+            } else {
+                userCustomHolidays = [];
+            }
+        } catch (error) {
+            userCustomHolidays = [];
+            localStorage.removeItem('workingday_holidays');
+        }
+        renderCustomHolidayList();
+    }
+
+    function saveCustomHolidays() {
+        localStorage.setItem('workingday_holidays', JSON.stringify(userCustomHolidays));
+    }
+
+    function addCustomHoliday() {
+        let dateInput = document.getElementById('customHolidayDate').value;
+        let reason = document.getElementById('customHolidayReason').value.trim();
+        if (!dateInput) { alert("ছুটির তারিখ নির্বাচন করুন।"); return; }
+        if (!reason) { alert("ছুটির কারণ লিখুন।"); return; }
+        if (userCustomHolidays.some(h => h.date === dateInput)) { alert("এই তারিখে ইতিমধ্যে ছুটি আছে।"); return; }
+        userCustomHolidays.push({
+            date: dateInput,
+            reason: reason
+        });
+
+        userCustomHolidays.sort((a,b) => new Date(a.date) - new Date(b.date));
+        saveCustomHolidays();
+        renderCustomHolidayList();
+        document.getElementById('customHolidayDate').value = '';
+        document.getElementById('customHolidayReason').value = '';
+        
+        let start = document.getElementById('startDate').value;
+        let end = document.getElementById('endDate').value;
+        if(start && end) calculateWorkingDays();
+        else alert("কাস্টম ছুটি যুক্ত হয়েছে। পুনরায় হিসাব করতে শুরুর ও শেষের তারিখ দিয়ে 'হিসাব করুন' ক্লিক করুন।");
+    }
+
+    function removeCustomHoliday(index) {
+        userCustomHolidays.splice(index, 1);
+        saveCustomHolidays();
+        renderCustomHolidayList();
+        let start = document.getElementById('startDate').value;
+        let end = document.getElementById('endDate').value;
+        if(start && end) calculateWorkingDays();
+    }
+
+    function renderCustomHolidayList() {
+        const container = document.getElementById('customHolidayList');
+        if(!container) return;
+        if(userCustomHolidays.length === 0) {
+            container.innerHTML = '<div style="padding:6px; text-align:center; color:var(--text-soft);">⚡ কোন কাস্টম ছুটি যোগ হয়নি</div>';
+            return;
+        }
+        container.innerHTML = '';
+        userCustomHolidays.forEach((hol, idx) => {
+            let div = document.createElement('div');
+            div.className = 'holiday-item';
+
+            let text = document.createElement('span');
+            text.textContent = `${hol.date} - ${hol.reason}`;
+
+            let del = document.createElement('span');
+            del.className = 'del-holiday';
+            del.textContent = '✖ মুছুন';
+            del.onclick = () => removeCustomHoliday(idx);
+
+            div.appendChild(text);
+            div.appendChild(del);
+
+            container.appendChild(div);
+        });
+    }
+
+    // Get holidays in range (predefined + religious + custom)
+    function getAllHolidaysInRange(startDate, endDate) {
+        let result = [];
+        let startYear = startDate.getFullYear();
+        let endYear = endDate.getFullYear();
+        
+        for (let year = startYear; year <= endYear; year++) {
+            // ১. ফিক্সড ছুটি চেক করা
+            for (let h of fixedHolidays) {
+                let [month, day] = h.mmdd.split('-');
+                let d = new Date(year, parseInt(month) - 1, parseInt(day));
+                let dateStr = formatDateYMD(d);
+                if (d >= startDate && d <= endDate) {
+                    result.push({ date: dateStr, reason: h.name });
+                }
+            }
+            
+            // ২. ধর্মীয় পরিবর্তনশীল ছুটি চেক করা
+            if (religiousHolidays[year]) {
+                for (let rh of religiousHolidays[year]) {
+                    let [month, day] = rh.mmdd.split('-');
+                    let d = new Date(year, parseInt(month) - 1, parseInt(day));
+                    let dateStr = formatDateYMD(d);
+                    if (d >= startDate && d <= endDate) {
+                        let existingHoliday = result.find(r => r.date === dateStr);
+                        if (existingHoliday) {
+                            if (!existingHoliday.reason.includes(rh.name)) {
+                                existingHoliday.reason += ` ও ${rh.name}`;
+                            }
+                        } else {
+                            result.push({ date: dateStr, reason: rh.name });
+                        }
+                    }
+                }
+            }
+        }
+        
+        // ৩. ইউজারের নিজস্ব কাস্টম ছুটি চেক করা
+        for (let ch of userCustomHolidays) {
+            let d = new Date(ch.date);
+            if (d >= startDate && d <= endDate) {
+                let dateStr = ch.date;
+                let existingHoliday = result.find(r => r.date === dateStr);
+                if (existingHoliday) {
+                    if (!existingHoliday.reason.includes(ch.reason)) {
+                        existingHoliday.reason += `, ${ch.reason}`;
+                    }
+                } else {
+                    result.push({ date: dateStr, reason: ch.reason });
+                }
+            }
+        }
+        return result;
+    }
+
+    function isWeekend(dateObj) {
+        let day = dateObj.getDay();
+        return (day === 5 || day === 6); // 5=Friday, 6=Saturday
+    }
+
+    function getWeekdayName(dateObj) {
+        const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+        return days[dateObj.getDay()];
+    }
+
+    function formatDateYMD(date) {
+        let y = date.getFullYear();
+        let m = (date.getMonth()+1).toString().padStart(2,'0');
+        let d = date.getDate().toString().padStart(2,'0');
+        return `${y}-${m}-${d}`;
+    }
+    function formatDateDMY(date) {
+        let d = date.getDate().toString().padStart(2,'0');
+        let m = (date.getMonth()+1).toString().padStart(2,'0');
+        let y = date.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+    
+    function parseDate(dateString) {
+        const [year, month, day] = dateString.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    }
+
+    // Core calculation
+    function calculateWorkingDays() {
+        let startInput = document.getElementById('startDate').value;
+        let endInput = document.getElementById('endDate').value;
+        let includeEnd = document.getElementById('includeEnd').checked;
+
+        if (!startInput || !endInput) {
+            alert("দয়া করে শুরুর ও শেষের তারিখ নির্বাচন করুন।");
+            return;
+        }
+        let start = parseDate(startInput);
+        let end = parseDate(endInput);
+        if (start > end) {
+            alert("শুরুর তারিখ শেষের তারিখের পরে হতে পারে না!");
+            return;
+        }
+
+        let totalDays = 0;
+        let workingDays = 0;
+        let excludedEntries = []; // { dateFormatted, weekday, reason }
+        
+        let holidaysMap = new Map();
+        let holidaysInRange = getAllHolidaysInRange(start, end);
+        holidaysInRange.forEach(h => holidaysMap.set(h.date, h.reason));
+
+        let current = new Date(start);
+        let last = new Date(end);
+
+        // যদি শেষ তারিখ গণনায় না ধরতে চান
+        if (!includeEnd) {
+            last.setDate(last.getDate() - 1);
+        }
+
+        while (current <= last) {
+            totalDays++;
+            let dateStr = formatDateYMD(current);
+            let isWeekendFlag = isWeekend(current);
+            let holidayReason = holidaysMap.get(dateStr);
+            let excludeReason = "";
+            let excluded = false;
+
+            if (isWeekendFlag) {
+                excluded = true;
+                excludeReason = current.getDay() === 5 ? "শুক্রবার (সাপ্তাহিক ছুটি)" : "শনিবার (সাপ্তাহিক ছুটি)";
+            }
+            if (holidayReason && !excluded) {
+                excluded = true;
+                excludeReason = holidayReason + " (সরকারি ছুটি)";
+            } else if (holidayReason && excluded) {
+                excludeReason = excludeReason + ` & ${holidayReason}`;
+            }
+
+            if (excluded) {
+                excludedEntries.push({
+                    dateFormatted: formatDateDMY(current),
+                    weekday: getWeekdayName(current),
+                    reason: excludeReason
+                });
+            } else {
+                workingDays++;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+
+        // Update stats
+        document.getElementById('totalDaysSpan').innerText = totalDays;
+        document.getElementById('workingDaysSpan').innerText = workingDays;
+        document.getElementById('excludedSpan').innerText = excludedEntries.length;
+        document.getElementById('infoNote').innerHTML = `শুক্র-শনিবার + সরকারি ছুটি মিলিয়ে মোট ${excludedEntries.length} দিন বাদ পড়েছে।`;
+
+        // Render excluded list inside right panel
+        const excludedContainer = document.getElementById('excludedList');
+        if (excludedEntries.length === 0) {
+            excludedContainer.innerHTML = `<div style="text-align:center; padding:1rem;">✅ কোন বাদ পড়া দিন নেই। সব দিন কার্যদিবস।</div>`;
+        } else {
+            excludedContainer.innerHTML = '';
+            excludedEntries.forEach(entry => {
+                let div = document.createElement('div');
+                div.className = 'excluded-item';
+                let badgeClass = 'badge-holiday';
+
+                if (
+                    (entry.reason.includes('শুক্রবার') ||
+                    entry.reason.includes('শনিবার')) &&
+                    entry.reason.includes('&')
+                ) {
+                    badgeClass = 'badge-mixed';
+                }
+                else if (
+                    entry.reason.includes('শুক্রবার') ||
+                    entry.reason.includes('শনিবার')
+                ) {
+                    badgeClass = 'badge-weekend';
+                }
+                div.innerHTML = `
+                    <div class="excluded-date">${entry.dateFormatted} (${entry.weekday})</div>
+                    <div><span class="badge-reason ${badgeClass}">${entry.reason}</span></div>
+                `;
+                excludedContainer.appendChild(div);
+            });
+        }
+    }
+
+    // Sidebar & Dark Mode (same as main)
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    }
+    function toggleDarkMode() {
+        const body = document.body;
+        const btn = document.getElementById('themeBtn');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            btn.innerHTML = '🌙 Dark Mode';
+            btn.style.background = '#1a56db';
+            btn.style.color = 'white';
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            btn.innerHTML = '☀️ Light Mode';
+            btn.style.background = '#facc15';
+            btn.style.color = '#000';
+        }
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            const btn = document.getElementById('themeBtn');
+            btn.innerHTML = '☀️ Light Mode';
+            btn.style.background = '#facc15';
+            btn.style.color = '#000';
+        }
+        loadCustomHolidays();
+        // No initial calculation – fields are empty.
+    });
+
+    // Side Bar----------------------------------------------------------------------------------------------------------
+
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    }
+</script>
+</body>
+</html>

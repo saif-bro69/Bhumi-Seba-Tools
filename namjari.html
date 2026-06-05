@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>গ্রহীতার অংশ হিসাব | ডিজিটাল নামজারিতে গ্রহীতার অংশ ক্যালকুলেটর</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+
+    
+
+
+    <style>
+    :root {
+    --primary-blue: #1a56db;
+    --bg-light: #f3f4f6;
+    --text-dark: #1f2937;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --header-bg: #ffffff; /* লাইট মোডে সাদা */
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+        --bg-light: #0f172a;   /* আপনার ডার্ক ব্লু শেড */
+        --text-dark: #f3f4f6;
+        --card-bg: #1e293b;
+        --border-color: #334155;
+        --header-bg: #1e293b;  /* ডার্ক মোডে ডার্ক কালার */
+        --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+
+            transition: background 0.4s ease, color 0.4s ease; /* স্মুথ ট্রানজিশন */
+        }
+
+        /* Header Area */
+        header {
+            background-color: var(--header-bg);
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+        header span { color: var(--primary-blue); font-weight: 700; }
+
+        /* Main Layout */
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .left-column { flex: 65%; display: flex; flex-direction: column; gap: 1.5rem; }
+        .right-column { flex: 35%; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg); /* একবারই যথেষ্ট */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            transition: background 0.5s ease, transform 0.3s ease;
+            border: 1.6px solid var(--border-color);
+        }
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-dark); /* সরাসরি কালারের বদলে ভেরিয়েবল */
+            border-bottom: 2px solid var(--border-color); /* বর্ডারও ভেরিয়েবল */
+            padding-bottom: 0.5rem;
+            transition: color 0.4s ease, border-color 0.4s ease; /* স্মুথ পরিবর্তনের জন্য */
+        }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-input {
+            
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgb(113 174 255 / 80%);
+            border-radius: 50px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-dark);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            /* দুটি ট্রানজিশনকে এক লাইনে নিয়ে এলাম */
+            transition: background 0.4s ease, color 0.4s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+
+        }
+        .form-input:focus 
+        {
+                outline: none;
+                border-color: var(--primary-blue);
+                box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15);
+                background: var(--card-bg);
+        }
+
+
+        .form-input:hover {
+        border-color: #93c5fd; /* হালকা নীল বর্ডার */
+        transform: translateY(-4px); /* খুব সামান্য উপরে উঠবে */
+        box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15);
+        }
+
+        .owner-row { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
+        .owner-row .form-group { flex: 1; margin-bottom: 0; }
+        .remove-btn {
+        color: #ff0a0a; /* শুরুতে একটু হালকা ধূসর রঙ */
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 8px;
+        border-radius: 50%; /* গোল ব্যাকগ্রাউন্ডের জন্য */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* স্মুথ ট্রানজিশন */
+        line-height: 1;
+        }
+
+        .remove-btn:hover {
+        color: #ef4444; /* লাল রঙ হয়ে যাবে */
+        background-color: rgba(239, 68, 68, 0.1); /* হালকা লাল ব্যাকগ্রাউন্ড */
+        transform: rotate(90deg) scale(1.2); /* ৯০ ডিগ্রি ঘুরবে এবং একটু বড় হবে */
+        }
+        .remove-btn:active {
+        transform: scale(0.9); /* ক্লিক করলে একটু দেবে যাবে */
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: inline-block;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .btn-outline:hover { background: #e5effc;
+                                                
+        }
+        .btn-primary {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            width: 100%;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden; /* ক্লিক ইফেক্ট বাটনের বাইরে যাবে না */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover { 
+            background: linear-gradient(135deg, var(--primary-blue), #10b981);
+            transform: translateY(-2px); /* সামান্য উপরে উঠবে */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px); /* ক্লিক করলে একটু নিচে নামবে */
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            filter: brightness(0.9); /* সামান্য অন্ধকার হবে যেন মনে হয় বাটনটি ভেতরে ডেবে গেছে */
+        }
+        /* Results - Left Side Detailed */
+        .result-item {
+                        margin-bottom: 1.5rem; 
+                        border-bottom: 1px solid var(--border-color); 
+                        padding-bottom: 1.5rem; 
+                    }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .owner-name { font-size: 1.1rem; font-weight: 600; }
+        .share-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+        .progress-container { display: flex; align-items: center; gap: 1rem; }
+        .progress-label { font-size: 0.9rem; color: #6b7280; min-width: 80px; }
+        .progress-bar-bg { flex: 1; height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; 
+                            background: var(--primary-blue);
+                            border-radius: 5px; 
+                            width: 0%; 
+                            transition: width 2.5s cubic-bezier(0.1, 0.5, 0.5, 1); /* স্মুথ অ্যানিমেশনের জন্য */
+
+                         }
+        .progress-percent { font-size: 0.9rem; font-weight: 700; color: var(--primary-blue); min-width: 60px; text-align: right;}
+
+        /* Results - Right Side Summation */
+        .sum-list { list-style: none; }
+        .sum-item { display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 1rem; }
+        .sum-divider { height: 2px; background: var(--border-color); margin: 1rem 0; }
+        .sum-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Footer */
+        footer{
+            margin-top: 30px;
+            padding: 22px 15px;
+
+            text-align: center;
+
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #ffffff;
+
+            border-top: 1px solid rgba(255,255,255,0.08);
+
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* উপরের glow effect */
+        footer::before{
+            content: "";
+            position: absolute;
+
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 300px;
+            height: 120px;
+
+            background: radial-gradient(circle, rgba(107, 164, 255, 0.35), transparent 70%);
+        }
+
+        /* Text Style */
+        footer h2{
+            position: relative;
+            z-index: 2;
+
+            font-size: 1.6rem;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+
+            color: #cbd5e1;
+        }
+
+        /* Name Highlight */
+        footer strong{
+            color: #1fb5ff;
+            font-weight: 700;
+
+            transition: 0.3s ease;
+        }
+
+        footer strong:hover{
+            color: #00a9f2;
+            text-shadow: 0 0 12px rgba(96,165,250,0.7);
+        }
+
+        /* Responsive */
+        @media(max-width:768px){
+
+            footer{
+                padding: 18px 10px;
+            }
+
+            footer h2{
+                font-size: 1.3 rem;
+                line-height: 1.7;
+            }
+
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            main { flex-direction: column; padding: 1rem; }
+            .left-column, .right-column { flex: 100%; }
+            .owner-row { flex-direction: column; gap: 0.5rem; align-items: stretch; }
+             .remove-btn { align-self: flex-end; }
+        }
+
+        
+
+        /* বজ্রপাতের মেইন অ্যানিমেশন */
+        @keyframes lightning-strike {
+        0% { 
+            left: -120%; /* বারের বাম পাশ থেকে অনেক দূর থেকে শুরু হবে */
+            opacity: 0; 
+        }
+        20% { 
+            opacity: 0.6; /* আস্তে আস্তে আলো বাড়বে */
+        }
+        80% { 
+            opacity: 0.6; 
+        }
+        100% { 
+            left: 120%; /* ধীরে ধীরে ডান পাশে পার হয়ে যাবে */
+            opacity: 0; 
+        }
+    }
+
+        /* সব বারের জন্য বজ্রপাত ইফেক্ট */
+        .thunder-effect {
+            position: relative;
+            overflow: hidden; /* ভেতরের আলো যেন বাইরে না যায় */
+        }
+
+        .thunder-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            /* সাদা বিদ্যুৎ ঝলকানি */
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            transform: skewX(-25deg);
+            animation: lightning-strike 2.3s infinite; /* ২ সেকেন্ড পর পর চমকাবে */
+        }
+
+/* ইমোজি হার্টবিট অ্যানিমেশন */
+@keyframes emoji-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.winner-emoji, .loser-emoji {
+    display: inline-block;
+    animation: emoji-pulse 2s infinite ease-in-out;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+
+#sum-list .winner-emoji, #sum-list .loser-emoji {
+    font-size: 0.9rem; /* সারসংক্ষেপের জন্য ইমোজি সামান্য ছোট */
+
+}
+#sum-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px dashed #ddd; /* হালকা দাগ যেন আলাদা বোঝা যায় */
+}
+
+.sum-percent {
+    font-weight: bold;
+    color: var(--primary-blue);
+}
+
+
+/*----- সাইডবার বাটন স্টাইল ---------------------------------------------------------------------*/
+
+/* সাইডবার বাটন স্টাইল */
+        /* Sidebar 3D glass */
+        .sidebar-toggle-btn {
+    position: relative;
+    overflow: visible;
+
+    font-size: 34px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 60px;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text-dark);
+    cursor: pointer;
+
+    margin-left: 1.2rem;
+    margin-bottom: -20px;
+
+    transition: all .3s ease;
+}
+
+/* Arrow */
+.sidebar-toggle-btn::after{
+    content: "❯";
+
+    position: absolute;
+    left: 100%;
+    top: 50%;
+
+    transform: translateY(-50%) translateX(-15px);
+
+    opacity: 0;
+
+    font-size: 28px;
+    color: var(--primary-blue);
+
+    transition: all .35s ease;
+}
+
+/* Hover Effect */
+.sidebar-toggle-btn:hover{
+    background: #3b82f6;
+    color: white;
+
+    transform: scale(1.05);
+}
+
+.sidebar-toggle-btn:hover::after{
+    opacity: 1;
+    animation: arrowMove .8s infinite;
+}
+
+@keyframes arrowMove{
+    0%{
+        transform: translateY(-50%) translateX(0);
+    }
+    50%{
+        transform: translateY(-50%) translateX(12px);
+    }
+    100%{
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+/* সাইডবার মেইন স্টাইল */
+.sidebar {
+    position: fixed !important; /* ফিক্সড পজিশন নিশ্চিত করতে */
+    top: 0 !important;
+    left: -280px !important;    /* ডিফল্ট স্ক্রিনের বাইরে */
+    width: 280px;
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+    z-index: 99999 !important;  /* সর্বোচ্চ লেভেলে রাখা */
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    margin: 0 !important;       /* কোনো বাইরের মার্জিন যেন না থাকে */
+    overflow-y: auto;           /* কন্টেন্ট বেশি হলে স্ক্রল করার জন্য */
+
+    will-change: left; /* স্লাইড অ্যানিমেশন দ্রুত করার জন্য */
+    contain: layout;   /* ব্রাউজারকে পুরো পেজ পুনরায় রেন্ডার করা থেকে বিরত রাখে */
+}
+
+/* যখন সাইডবার খুলবে */
+.sidebar.open {
+    left: 0 !important;        /* একদম বামে ফিক্সড */
+}
+
+/* ইউজার প্রোফাইল ডিজাইন */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.user-profile img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* নেভিগেশন আইটেম */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 40px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    font-weight: 500;
+    transition: 0.3s;
+    color: var(--text-dark);
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: var(--primary-blue);
+    color: white !important;
+    transform: translateX(8px); /* হোভার করলে ৮ পিক্সেল ডানে সরবে */
+    box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+}
+
+.nav-item.active {
+    background: var(--primary-blue);
+    color: white;
+    box-shadow: 0 8px 15px rgba(26, 86, 219, 0.3);
+}
+
+/* আইকনগুলোর জন্য আলাদা হোভার ইফেক্ট (ঐচ্ছিক) */
+.nav-item span {
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover span {
+    transform: scale(1.2); /* হোভার করলে ইমোজি বা আইকন একটু বড় হবে */
+}
+
+/* Overlay (ব্যাকগ্রাউন্ড অন্ধকার করা) */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 99998; /* সাইডবারের ঠিক নিচে */
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+
+.user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+
+
+/* CSS Profile Logo Design */
+    .css-profile-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        /* সুন্দর নীল ও সবুজ রঙের 3D গ্লসি গ্রাডিয়েন্ট */
+        background: linear-gradient(135deg, #1a56db 0%, #10b981 100%);
+        box-shadow: 
+            inset -2px -2px 6px rgba(0, 0, 0, 0.3), 
+            inset 2px 2px 6px rgba(255, 255, 255, 0.6), 
+            0 4px 10px rgba(26, 86, 219, 0.3);
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .css-profile-logo:hover {
+        transform: scale(1.30) rotate(30deg);
+    }
+
+
+
+        
+
+
+    </style>
+    
+
+
+
+
+
+</head>
+<body>
+
+    <header style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--primary-blue)" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
+        </svg>
+        <h1><span>অংশ হিসাব</span> | নামজারি অংশ ক্যালকুলেটর</h1>
+        </div>
+        
+        <button onclick="toggleDarkMode()" id="themeBtn" style="padding: 8px 16px; border-radius: 20px; border: none; background: var(--primary-blue); color: white; cursor: pointer; font-weight: 600; transition: 0.3s;">
+            🌙 Dark Mode
+        </button>
+    </header>
+
+    <button onclick="toggleSidebar()" class="sidebar-toggle-btn">
+    ☰
+    </button>
+
+    <aside id="sidebar" class="sidebar">
+        <div class="user-profile">
+            <div class="css-profile-logo">$</div>
+            <div>
+                <h2>Saif Ahmed</h2>
+                <p> Canadian University of Bangladesh </p>
+            </div>
+        </div> 
+
+        <nav class="sidebar-nav">
+            <a href="namjari.html" class="nav-item active"> <span>📊</span> গ্রহীতার অংশ হিসাব
+            </a>
+            
+            <a href="faraiz.html" class="nav-item">
+                <span>⚖️</span> উত্তরাধিকার ক্যালকুলেটর
+            </a>
+
+            <a href="obhijog.html" class="nav-item"> <span>📝</span> অভিযোগ সেকশন
+            </a>
+
+            <a href="ticket.html" class="nav-item"> <span>📩</span> টিকেট সেকশন
+            </a>
+
+            <a href="letterwriter.html" class="nav-item"> <span>📞</span> লেটার রাইটার নাম্বার
+            </a>
+            <a href="workingday.html" class="nav-item"><span>📅</span> কার্যদিবস ক্যালকুলেটর</a>
+            
+            
+        </nav>
+
+    </aside>
+
+    <div id="overlay" onclick="toggleSidebar()"></div>
+
+    
+
+    <main>
+        <section class="left-column">
+            <div class="card">
+                <h2>জমির তথ্য ও মালিকানা ইনপুট</h2>
+                <div class="form-group">
+                    <label class="form-label">মোট জমির পরিমাণ (শতাংশ/একর)</label>
+                    <input type="number" id="totalLand" class="form-input" placeholder="যেমন: ৫০">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" style="margin-top: 1.5rem;">ব্যক্তিগত মালিকানার তথ্য</label>
+                    <div id="ownersContainer">
+                        </div>
+                </div>
+
+                <button class="btn btn-outline" onclick="addNewOwnerRow()">+ আরো মালিক যুক্ত করুন</button>
+                <button class="btn btn-primary" onclick="calculateResult()">ফলাফল হিসাব করুন</button>
+            </div>
+
+            <div class="card" id="detailedResultsCard" style="display: none;">
+                <h2>বিস্তারিত নামজারি ফলাফল (প্রতি ১০০০ অংশে)</h2>
+                <div id="detailedResultsList">
+                    </div>
+            </div>
+        </section>
+
+        <section class="right-column">
+             <div class="card" id="chartCard" style="display: none;">
+                <h2>মালিকানার দৃশ্যমান চিত্র (Pie Chart)</h2>
+                <div class="chart-container">
+                    <canvas id="ownershipChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card" id="sumCard" style="display: none;">
+                <h2>মোট অংশের সারসংক্ষেপ</h2>
+                <ul class="sum-list" id="sumList">
+                    </ul>
+                <div class="sum-divider"></div>
+                <div class="sum-total">
+                    <span>সর্বমোট অংশ :</span>
+                    <span id="finalTotalShare">১০০০.০০০</span>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+
+
+
+
+
+
+    </main>
+
+    <footer>
+        <h2> &copy; This website developed by <strong>Saif bro... </strong> 😏 </h2>
+    </footer>
+
+
+
+
+    <script>
+    // Chart.js এর জন্য প্লাগিন রেজিস্টার করা
+    Chart.register(ChartDataLabels);
+    let myPieChart = null;
+
+    // গ্লোবাল কালার প্যালেট (পাই চার্ট এবং প্রগ্রেস বার উভয়ের জন্য)
+    const chartColors = ['#1AE67E', '#75B7FF', '#FF7373', '#1AF2FF', '#C085FF', '#FFB400', '#26C1FF', '#82F5A3'];
+
+    // পেজ লোড হলে প্রথমে ৪টি ইনপুট ফিল্ড তৈরি হবে
+    window.onload = function() {
+        for(let i=0; i<4; i++) {
+            addNewOwnerRow();
+        }
+    };
+
+    // নতুন মালিকের ইনপুট রো যুক্ত করার ফাংশন
+    function addNewOwnerRow() {
+        const container = document.getElementById('ownersContainer');
+        const row = document.createElement('div');
+        row.className = 'owner-row';
+        row.innerHTML = `
+            <div class="form-group">
+                <input type="text" class="form-input owner-name-input" placeholder="মালিকের নাম">
+            </div>
+            <div class="form-group">
+                <input type="number" class="form-input owner-share-input" placeholder="প্রাপ্য জমি/অংশ">
+            </div>
+            <span class="remove-btn" onclick="removeRow(this)" title="মুছে ফেলুন">✖</span>
+        `;
+        container.appendChild(row);
+    }
+
+    // রো মুছে ফেলার ফাংশন
+    function removeRow(btn) {
+        if(document.querySelectorAll('.owner-row').length > 1) {
+            btn.closest('.owner-row').remove();
+        } else {
+            alert("কমপক্ষে একজন মালিকের তথ্য থাকা আবশ্যক।");
+        }
+    }
+
+    // মূল হিসাব করার ফাংশন
+    function calculateResult() {
+        const totalLand = parseFloat(document.getElementById('totalLand').value);
+        const nameInputs = document.querySelectorAll('.owner-name-input');
+        const shareInputs = document.querySelectorAll('.owner-share-input');
+
+        if (isNaN(totalLand) || totalLand <= 0) {
+            alert("অনুগ্রহ করে মোট জমির পরিমাণ সঠিকভাবে দিন।");
+            return;
+        }
+
+        let calculatedData = [];
+        let totalCalculatedShare = 0;
+
+        nameInputs.forEach((nameInput, index) => {
+            const name = nameInput.value.trim() || `মালিক ${index + 1}`;
+            const individualLand = parseFloat(shareInputs[index].value);
+
+            if (!isNaN(individualLand) && individualLand >= 0) {
+                const resultShare = (individualLand / totalLand) * 1000;
+                const percentage = (resultShare / 1000) * 100;
+                
+                // ইনডেক্স অনুযায়ী কালার নির্ধারণ
+                const assignedColor = chartColors[index % chartColors.length];
+
+                calculatedData.push({
+                    name: name,
+                    share1000: resultShare,
+                    percent: percentage,
+                    color: assignedColor // কালার অবজেক্টে সেভ করে রাখছি
+                });
+                totalCalculatedShare += resultShare;
+            }
+        });
+
+        if(calculatedData.length === 0) {
+            alert("অনুগ্রহ করে অন্তত একজন মালিকের প্রাপ্য জমির পরিমাণ দিন।");
+            return;
+        }
+
+        renderDetailedResults(calculatedData);
+        renderSummation(calculatedData, totalCalculatedShare);
+        renderChart(calculatedData);
+
+        document.getElementById('detailedResultsCard').style.display = 'block';
+        document.getElementById('chartCard').style.display = 'block';
+        document.getElementById('sumCard').style.display = 'block';
+        document.getElementById('detailedResultsCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+
+    // বাম পাশের বিস্তারিত ফলাফল রেন্ডার করা (ডায়নামিক কালার সহ)
+
+    
+    
+    function renderDetailedResults(data) {
+    const container = document.getElementById('detailedResultsList');
+    container.innerHTML = ''; 
+
+    // ১. সবচেয়ে বেশি এবং সবচেয়ে কম শতাংশ বের করা
+    const percents = data.map(item => item.percent);
+    const maxPercent = Math.max(...percents);
+    const minPercent = Math.min(...percents);
+
+    data.forEach((item, index) => {
+        // ২. ইমোজি নির্ধারণ লজিক
+        let emojiHtml = '';
+        if (item.percent === maxPercent && item.percent > 0) {
+            emojiHtml = `<span class="winner-emoji" title="সর্বোচ্চ মালিক">😎</span>`; // রাজার মুকুট বা বড় ইমোজি
+        } else if (item.percent === minPercent && item.percent < maxPercent) {
+            emojiHtml = `<span class="loser-emoji" title="সর্বনিম্ন মালিক">😢</span>`; // দুঃখজনক ইমোজি
+        }
+
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.innerHTML = `
+            <div class="result-header">
+                <span class="owner-name">${item.name} ${emojiHtml}</span>
+                <span class="share-badge" style="background: ${item.color}22; color: ${item.color}; border: 1px solid ${item.color}"> 
+                    ${Number(item.share1000.toFixed(3))} অংশ 
+                </span>
+            </div>
+            <div class="progress-container">
+                <span class="progress-label">শতকরা হার:</span>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill thunder-effect" id="bar-${index}" style="background: ${item.color}"></div>
+                </div>
+                <span class="progress-percent" style="color: ${item.color}">${item.percent.toFixed(2)}%</span>
+            </div>
+        `;
+        container.appendChild(resultItem);
+
+        setTimeout(() => {
+            const bar = document.getElementById(`bar-${index}`);
+            if(bar) {
+                bar.style.width = item.percent.toFixed(2) + '%';
+            }
+        }, index * 999); 
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    // ডান পাশের যোগফল রেন্ডার করা
+   // ডান পাশের যোগফল রেন্ডার করা (ইমোজি লজিক সহ)
+    function renderSummation(data, total) {
+        const listContainer = document.getElementById('sumList');
+        listContainer.innerHTML = '';
+
+        // ১. সর্বোচ্চ এবং সর্বনিম্ন অংশ বের করা
+        const shares = data.map(item => item.share1000);
+        const maxShare = Math.max(...shares);
+        const minShare = Math.min(...shares);
+
+        data.forEach(item => {
+            // ২. ইমোজি নির্ধারণ লজিক
+            let emojiHtml = '';
+            if (item.share1000 === maxShare && item.share1000 > 0) {
+                emojiHtml = `<span class="winner-emoji">😎</span>`;
+            } else if (item.share1000 === minShare && item.share1000 < maxShare) {
+                emojiHtml = `<span class="loser-emoji">😞</span>`;
+            }
+
+            const li = document.createElement('li');
+            li.className = 'sum-item';
+            // ৩. নাম এবং অংশের সাথে ইমোজি যোগ করা
+            li.innerHTML = `
+                <span>${item.name} ${emojiHtml}</span> 
+                <span style="color: ${item.color}; font-weight: bold;">${Number(item.share1000.toFixed(3))}</span>
+            `;
+            listContainer.appendChild(li);
+        });
+        
+        // সর্বমোট অংশ আপডেট
+        document.getElementById('finalTotalShare').innerText = Number(total.toFixed(3));
+    }
+
+    // পাই চার্ট রেন্ডার করা
+    function renderChart(data) {
+        const ctx = document.getElementById('ownershipChart').getContext('2d');
+        const labels = data.map(item => item.name);
+        const chartData = data.map(item => Number(item.share1000.toFixed(3)));
+        const bgColors = data.map(item => item.color); // ডাটা থেকে সরাসরি কালার ব্যবহার
+
+        if (myPieChart) {
+            myPieChart.destroy();
+        }
+
+        myPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: bgColors,
+                    borderColor: document.body.getAttribute('data-theme') === 'dark' ? '#1e293b' : '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 25,
+                }]
+            },
+            options: {
+                cutout: '1%',
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: 20 },
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { 
+                                // এই লাইনটি যোগ করুন: মোড অনুযায়ী টেক্সট কালার পরিবর্তন হবে
+                                color: document.body.getAttribute('data-theme') === 'dark' ? '#f3f4f6' : '#1f2937', 
+                                font: { family: "'Hind Siliguri', sans-serif", size: 12 
+                                
+                                } 
+                            }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed.toFixed(3) + ' অংশ';
+                                return label;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#333', // হালকা ব্যাকগ্রাউন্ডে ভালো দেখার জন্য কালার পরিবর্তন
+                        font: { weight: 'bold', size: 11, family: "'Hind Siliguri', sans-serif" },
+                        formatter: (value, ctx) => {
+                            let sum = 0;
+                            let dataArr = ctx.chart.data.datasets[0].data;
+                            dataArr.map(data => { sum += data; });
+                            let percentage = (value*100 / sum).toFixed(1)+"%";
+                            return (value*100 / sum) > 5 ? percentage : null;
+                        },
+                        anchor: 'end',
+                        align: 'start'
+                    }
+                },
+                elements: {
+                    arc: {
+                        shadowOffsetX: 5,
+                        shadowOffsetY: 5,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0,0,0,0.2)'
+                    }
+                }
+            }
+        });
+    }
+
+
+// ১. পেজ লোড হওয়ার সাথে সাথে চেক করবে ডার্ক মোড অন করা ছিল কিনা
+document.addEventListener("DOMContentLoaded", function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        const btn = document.getElementById('themeBtn');
+        btn.innerHTML = '☀️ Light Mode';
+        btn.style.background = '#facc15';
+        btn.style.color = '#000';
+    }
+});
+
+// ২. বাটনে ক্লিক করলে লোকাল স্টোরেজে ডেটা সেভ হবে
+function toggleDarkMode() {
+    const body = document.body;
+    const btn = document.getElementById('themeBtn');
+    
+    // মোড সুইচ ও লোকাল স্টোরেজে সেভ লজিক
+    if (body.getAttribute('data-theme') === 'dark') {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light'); // লাইট মোড সেভ
+        
+        btn.innerHTML = '🌙 Dark Mode';
+        btn.style.background = '#1a56db';
+        btn.style.color = 'white';
+    } else {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark'); // ডার্ক মোড সেভ
+        
+        btn.innerHTML = '☀️ Light Mode';
+        btn.style.background = '#facc15'; 
+        btn.style.color = '#000';
+    }
+
+    // চার্ট আপডেট
+    if (myPieChart) {
+        calculateResult(); 
+    }
+}
+
+
+// Side Bar----------------------------------------------------------------------------------------------------------
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+}
+
+
+</script>
+</body>
+</html>
