@@ -336,7 +336,7 @@
         #resultArea { margin-top: 30px; display: none; background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--border-color); }
         .result-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .result-table th, .result-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .result-table th { background: #dcedff; font-weight: bold; }
+        .result-table th { background: #0050a5; font-weight: bold; }
 .chart-container {
     width: 100%;
     max-width: 550px;
@@ -1148,9 +1148,12 @@
 
                 for(let i=0; i<indivCount; i++) {
                     let name = indivCount > 1 ? `${baseName} - ${toBn(i+1)}` : baseName;
+                    let isDark = document.body.getAttribute('data-theme') === 'dark';
+                    let percentColor = isDark ? '#ffffff' : '#1a56db';
+                    
                     let row = `<tr>
                         <td style="font-weight:600;">${name}</td>
-                        <td style="color:var(--primary-blue); font-weight:bold;">${toBn(percent)}%</td>
+                        <td style="color:${percentColor}; font-weight:bold;">${toBn(percent)}%</td>
                         <td>${toBn((inputs.land * perPersonShare).toFixed(3))}</td>
                         <td>${toBn((inputs.gold * perPersonShare).toFixed(3))}</td>
                         <td>${toBn((inputs.silver * perPersonShare).toFixed(3))}</td>
